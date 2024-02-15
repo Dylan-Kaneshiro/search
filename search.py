@@ -136,12 +136,14 @@ def breadthFirstSearch(problem):
         return filter(lambda x: not x[0] in visited, problem.getSuccessors(cur_state))
     
     queue = util.Queue()
-    visited = set()
+    visited = set() # items in this look like: (5,5)
 
-    cur_state = problem.getStartState()
-    cur = (cur_state, None, None)
+    cur_state = problem.getStartState() # e.g. (5,5)
+    cur = (cur_state, None, None) # e.g. ((5,4), 'South', 1)
     for successor in problem.getSuccessors(cur_state):
         queue.push((successor, cur_state))
+        # items in queue data structure look like:
+        # (((5,4), 'South', 1), (5,5))
     paths = {}
     
     while(not problem.isGoalState(cur_state) and not queue.isEmpty()):
@@ -158,7 +160,7 @@ def breadthFirstSearch(problem):
             queue.push((successor, cur_state))
         
         # Update paths
-        paths[cur_state] = (parent, cur[1])
+        paths[cur_state] = (parent, cur[1]) # e.g. paths[(5,4)] = ((5,5), 'South')
 
     
     if problem.isGoalState(cur_state):
