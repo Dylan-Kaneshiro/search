@@ -197,16 +197,19 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     visited = set() # items in this look like: (5,5)
 
     cur_state = problem.getStartState() # e.g. (5,5)
-    cur = (cur_state, None, None, 0) # e.g. ((5,4), 'South', 1, 17)
+    cur = (cur_state, None, None) # e.g. ((5,4), 'South', 1)
     for successor in problem.getSuccessors(cur_state):
-        priority = problem.getCostOfActions([successor[1]]) + heuristic(successor[0], problem)
-        queue.push((successor, cur_state), priority)
+        cur_cost = successor[2]
+        priority = cur_cost + heuristic(successor[0], problem)
+        queue.push((successor, cur_state, cur_cost), priority)
+        # items in queue data structure look like:
+        # (((5,4), 'South', 1), (5,5), 1)
     paths = {}
     
     while(not problem.isGoalState(cur_state) and not queue.isEmpty()):
         
         # Update cur and cur_state
-        cur, parent = queue.pop()
+        cur, parent, cur_cost = queue.pop()
         cur_state = cur[0]
 
         # Update visited
@@ -214,18 +217,14 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
         # Add children to stack
         for successor in get_unvisited_successors(problem, cur_state, visited):
-            path = []
-            while not cur_state == problem.getStartState():
-                cur_state, action = paths[cur_state]
-                path.append(action)
-            path.reverse()
-            priority = problem.getCostOfActions(path) + heuristic(successor[0], problem)
-            queue.push((successor, cur_state), priority)
+            cur_cost += successor[2]
+            priority = cur_cost + heuristic(successor[0], problem)
+            queue.push((successor, cur_state, cur_cost), priority)
         
         # Update paths
         paths[cur_state] = (parent, cur[1]) # e.g. paths[(5,4)] = ((5,5), 'South')
 
-    
+
     if problem.isGoalState(cur_state):
         # Compile path from goal to start
         path = []
@@ -237,6 +236,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     else:
         print("Goal not found")
         return None
+
 
 
 # Abbreviations
