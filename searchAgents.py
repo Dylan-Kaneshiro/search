@@ -208,9 +208,6 @@ class PositionSearchProblem(search.SearchProblem):
             self._visited[state] = True
             self._visitedlist.append(state)
 
-        # TESTING: display node that was expanded - every node expanded should be unique
-        print(state)
-
         return successors
 
     def getCostOfActions(self, actions):
@@ -340,9 +337,6 @@ class CornersProblem(search.SearchProblem):
                 successor_state = (next_position, tuple((state[1][i] or next_position == self.corners[i]) for i in range(4)))
                 successors.append((successor_state, action, 1))
 
-        # TESTING: display node that was expanded - every node expanded should be unique
-        print(state)
-
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
@@ -377,7 +371,15 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    # Calculate sum of manhattan distances to each corner from current position
+    # Admissible: Maybe
+    # Consistent: No
+    total_manhattan_distance = 0
+    for i in range(4):
+        # If a corner hasn't been visited, add manhattan_distance
+        if not state[1][i]:
+            total_manhattan_distance += util.manhattanDistance(state[0], corners[i])
+    return total_manhattan_distance
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"

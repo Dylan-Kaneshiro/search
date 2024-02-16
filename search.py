@@ -137,9 +137,11 @@ def breadthFirstSearch(problem):
     visited = set() # items in this look like: (5,5)
 
     cur_state = problem.getStartState() # e.g. (5,5)
+    visited.add(cur_state)
     cur = (cur_state, None, None) # e.g. ((5,4), 'South', 1)
     for successor in problem.getSuccessors(cur_state):
         queue.push((successor, cur_state))
+        visited.add(successor[0])
         # items in queue data structure look like:
         # (((5,4), 'South', 1), (5,5))
     paths = {}
@@ -149,16 +151,15 @@ def breadthFirstSearch(problem):
         # Update cur and cur_state
         cur, parent = queue.pop()
         cur_state = cur[0]
-        if cur_state not in visited:
-            # Update visited
-            visited.add(cur_state)
 
-            # Add children to stack
-            for successor in problem.getSuccessors(cur_state):
+        # Add children to stack
+        for successor in problem.getSuccessors(cur_state):
+            if successor[0] not in visited:
                 queue.push((successor, cur_state))
-            
-            # Update paths
-            paths[cur_state] = (parent, cur[1]) # e.g. paths[(5,4)] = ((5,5), 'South')
+                visited.add(successor[0])
+        
+        # Update paths
+        paths[cur_state] = (parent, cur[1]) # e.g. paths[(5,4)] = ((5,5), 'South')
 
 
     if problem.isGoalState(cur_state):
@@ -193,11 +194,13 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     visited = set() # items in this look like: (5,5)
 
     cur_state = problem.getStartState() # e.g. (5,5)
+    visited.add(cur_state)
     cur = (cur_state, None, None) # e.g. ((5,4), 'South', 1)
     for successor in problem.getSuccessors(cur_state):
         cur_cost = successor[2]
         priority = cur_cost + heuristic(successor[0], problem)
         queue.push((successor, cur_state, cur_cost), priority)
+        visited.add(successor[0])
         # items in queue data structure look like:
         # (((5,4), 'South', 1), (5,5), 1)
     paths = {}
@@ -207,19 +210,17 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         # Update cur and cur_state
         cur, parent, cur_cost = queue.pop()
         cur_state = cur[0]
-        
-        if cur_state not in visited:
-            # Update visited
-            visited.add(cur_state)
 
-            # Add children to stack
-            for successor in problem.getSuccessors(cur_state):
+        # Add children to stack
+        for successor in problem.getSuccessors(cur_state):
+            if successor[0] not in visited:
                 cur_cost += successor[2]
                 priority = cur_cost + heuristic(successor[0], problem)
                 queue.push((successor, cur_state, cur_cost), priority)
-            
-            # Update paths
-            paths[cur_state] = (parent, cur[1]) # e.g. paths[(5,4)] = ((5,5), 'South')
+                visited.add(successor[0])
+        
+        # Update paths
+        paths[cur_state] = (parent, cur[1]) # e.g. paths[(5,4)] = ((5,5), 'South')
 
 
     if problem.isGoalState(cur_state):
