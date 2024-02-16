@@ -371,15 +371,28 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    # Calculate sum of manhattan distances to each corner from current position
-    # Admissible: Maybe
-    # Consistent: No
-    total_manhattan_distance = 0
-    for i in range(4):
-        # If a corner hasn't been visited, add manhattan_distance
-        if not state[1][i]:
-            total_manhattan_distance += util.manhattanDistance(state[0], corners[i])
-    return total_manhattan_distance
+    # Calculate the minimum total manhattan distance to goal: distance to nearest unvisited corner + distance to from that corner to the next nearest unvisited corner + ...
+    # This value will always be less than or equal to the actual distance
+    min_manhattan_distance = 0
+    current_pos = state[0]
+    unvisited_corners = set([corners[i] for i in range(4) if not state[1][i]])
+
+    # Add to manhattan distance until all corners are visited
+    while not len(unvisited_corners) == 0:
+        # Find the nearest unvisited corner to the current position (actual current position or a newly visited corner)
+        min_dist = 999999
+        min_corner = None
+        for corner in unvisited_corners:
+            current_dist = util.manhattanDistance(current_pos, corner)
+            if current_dist < min_dist:
+                min_dist = current_dist
+                min_corner = corner
+        
+        # Add distance to newly visited corner, set to new position, and remove from unvisited corners
+        min_manhattan_distance += min_dist
+        current_pos = min_corner
+        unvisited_corners.remove(current_pos)
+    return min_manhattan_distance
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
