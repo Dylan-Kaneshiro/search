@@ -458,7 +458,7 @@ def foodHeuristic(state, problem):
     # problem.walls.asList() e.g. [(0, 0), (0, 1), (0, 2), ... (8, 6)]
 
     "*** YOUR CODE HERE ***"
-    return len(foodGrid.asList())
+    return 0
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"

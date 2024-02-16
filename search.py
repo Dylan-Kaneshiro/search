@@ -132,8 +132,6 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    def get_unvisited_successors(problem, cur_state, visited):
-        return filter(lambda x: not x[0] in visited, problem.getSuccessors(cur_state))
     
     queue = util.Queue()
     visited = set() # items in this look like: (5,5)
@@ -151,18 +149,18 @@ def breadthFirstSearch(problem):
         # Update cur and cur_state
         cur, parent = queue.pop()
         cur_state = cur[0]
+        if cur_state not in visited:
+            # Update visited
+            visited.add(cur_state)
 
-        # Update visited
-        visited.add(cur_state)
+            # Add children to stack
+            for successor in problem.getSuccessors(cur_state):
+                queue.push((successor, cur_state))
+            
+            # Update paths
+            paths[cur_state] = (parent, cur[1]) # e.g. paths[(5,4)] = ((5,5), 'South')
 
-        # Add children to stack
-        for successor in get_unvisited_successors(problem, cur_state, visited):
-            queue.push((successor, cur_state))
-        
-        # Update paths
-        paths[cur_state] = (parent, cur[1]) # e.g. paths[(5,4)] = ((5,5), 'South')
 
-    
     if problem.isGoalState(cur_state):
         # Compile path from goal to start
         path = []
@@ -190,8 +188,6 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    def get_unvisited_successors(problem, cur_state, visited):
-        return filter(lambda x: not x[0] in visited, problem.getSuccessors(cur_state))
     
     queue = util.PriorityQueue()
     visited = set() # items in this look like: (5,5)
@@ -211,15 +207,17 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         # Update cur and cur_state
         cur, parent, cur_cost = queue.pop()
         cur_state = cur[0]
-
+        
         # Update visited
         visited.add(cur_state)
 
         # Add children to stack
-        for successor in get_unvisited_successors(problem, cur_state, visited):
-            cur_cost += successor[2]
-            priority = cur_cost + heuristic(successor[0], problem)
-            queue.push((successor, cur_state, cur_cost), priority)
+        for successor in problem.getSuccessors(cur_state):
+            if successor[0] not in visited:
+                cur_cost += successor[2]
+                priority = cur_cost + heuristic(successor[0], problem)
+                visited.add(successor[0])
+                queue.push((successor, cur_state, cur_cost), priority)
         
         # Update paths
         paths[cur_state] = (parent, cur[1]) # e.g. paths[(5,4)] = ((5,5), 'South')
@@ -236,7 +234,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     else:
         print("Goal not found")
         return None
-
 
 
 # Abbreviations
