@@ -188,40 +188,25 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    
+    cur_state = problem.getStartState()
     queue = util.PriorityQueue()
-    visited = set() # items in this look like: (5,5)
-
-    cur_state = problem.getStartState() # e.g. (5,5)
-    cur = (cur_state, None, None) # e.g. ((5,4), 'South', 1)
-    for successor in problem.getSuccessors(cur_state):
-        cur_cost = successor[2]
-        priority = cur_cost + heuristic(successor[0], problem)
-        queue.push((successor, cur_state, cur_cost), priority)
-        # items in queue data structure look like:
-        # (((5,4), 'South', 1), (5,5), 1)
+    visited = set()
     paths = {}
-    
-    while(not problem.isGoalState(cur_state) and not queue.isEmpty()):
-        
-        # Update cur and cur_state
-        cur, parent, cur_cost = queue.pop()
-        cur_state = cur[0]
-        
-        # Update visited
-        visited.add(cur_state)
 
-        # Add children to stack
-        for successor in problem.getSuccessors(cur_state):
-            if successor[0] not in visited:
-                cur_cost += successor[2]
-                priority = cur_cost + heuristic(successor[0], problem)
-                visited.add(successor[0])
-                queue.push((successor, cur_state, cur_cost), priority)
-        
-        # Update paths
-        paths[cur_state] = (parent, cur[1]) # e.g. paths[(5,4)] = ((5,5), 'South')
+    queue.push((cur_state, 0), 0 )
 
+    while (not problem.isGoalState(cur_state) and not queue.isEmpty()):
+        cur_state, costs = queue.pop()
+
+        if not cur_state in visited:
+
+            visited.add(cur_state)
+            
+            for state, action, cost in problem.getSuccessors(cur_state):
+                if not state in visited:
+                    heuristicCost = costs + cost + heuristic(state, problem)
+                    queue.push((state, costs + cost), heuristicCost)
+                    paths[state] = (cur_state, action)
 
     if problem.isGoalState(cur_state):
         # Compile path from goal to start
@@ -234,6 +219,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     else:
         print("Goal not found")
         return None
+
+
 
 
 # Abbreviations
