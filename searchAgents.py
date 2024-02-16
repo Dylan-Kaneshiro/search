@@ -463,7 +463,8 @@ def foodHeuristic(state, problem):
         return 0
 
     "*** YOUR CODE HERE ***"
-    food_distances = [abs(x[0] - position[0]) + abs(x[1] - position[1]) for x in food]
+    # food_distances = [abs(x[0] - position[0]) + abs(x[1] - position[1]) for x in food]
+    food_distances = [mazeDistance(position, x, problem.startingGameState) for x in food]
     return max(food_distances)
 
 class ClosestDotSearchAgent(SearchAgent):
