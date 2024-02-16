@@ -208,6 +208,9 @@ class PositionSearchProblem(search.SearchProblem):
             self._visited[state] = True
             self._visitedlist.append(state)
 
+        # TESTING: display node that was expanded - every node expanded should be unique
+        print(state)
+
         return successors
 
     def getCostOfActions(self, actions):
@@ -295,14 +298,16 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Store position and whether each corner has been visited
+        return (self.startingPosition, tuple(self.startingPosition == self.corners[i] for i in range(4)))
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Check whether every corner has been visited
+        return state[1][0] and state[1][1] and state[1][2] and state[1][3]
 
     def getSuccessors(self, state):
         """
@@ -325,6 +330,18 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x,y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+
+            # If new position doesn't hit wall, add as successor
+            if not self.walls[nextx][nexty]:
+                next_position = (nextx, nexty)
+                successor_state = (next_position, tuple((state[1][i] or next_position == self.corners[i]) for i in range(4)))
+                successors.append((successor_state, action, 1))
+
+        # TESTING: display node that was expanded - every node expanded should be unique
+        print(state)
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
