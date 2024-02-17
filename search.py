@@ -101,6 +101,7 @@ def depthFirstSearch(problem):
 
     cur_state = problem.getStartState()
     cur = (cur_state, None, None)
+    visited.add(cur_state)
     for successor in problem.getSuccessors(cur_state):
         stack.push((successor, cur_state))
     path_to_cur = [cur]
@@ -110,6 +111,12 @@ def depthFirstSearch(problem):
         # Update cur and cur_state
         cur, parent = stack.pop()
         cur_state = cur[0]
+
+        # check if goal
+        if problem.isGoalState(cur_state):
+            path_to_cur = trim_path(path_to_cur, parent)
+            path_to_cur.append(cur)
+            break
 
         # Update visited
         visited.add(cur_state)
@@ -138,6 +145,7 @@ def breadthFirstSearch(problem):
 
     cur_state = problem.getStartState() # e.g. (5,5)
     cur = (cur_state, None, None) # e.g. ((5,4), 'South', 1)
+    visited.add(cur_state)
     for successor in problem.getSuccessors(cur_state):
         queue.push((successor, cur_state))
         # items in queue data structure look like:
@@ -149,6 +157,12 @@ def breadthFirstSearch(problem):
         # Update cur and cur_state
         cur, parent = queue.pop()
         cur_state = cur[0]
+
+        # Check if goal state
+        if problem.isGoalState(cur_state):
+            paths[cur_state] = (parent, cur[1])
+            break
+
         if cur_state not in visited:
             # Update visited
             visited.add(cur_state)
