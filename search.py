@@ -205,15 +205,14 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     cur_state = problem.getStartState()
     queue = util.PriorityQueue()
     visited = set()
-    paths = {}
 
-    queue.push((cur_state, 0), 0 )
+    queue.push((cur_state, [], 0), 0 )
 
     while (not queue.isEmpty()):
-        cur_state, cost = queue.pop()
+        cur_state, action_list, cost = queue.pop()
 
         if problem.isGoalState(cur_state):
-            break
+            return action_list
 
         if cur_state not in visited:
 
@@ -222,20 +221,12 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             for successor in problem.getSuccessors(cur_state):
                 new_state, action, step_cost = successor
                 if new_state not in visited:
-                    queue.push((new_state, cost + step_cost), cost + step_cost + heuristic(new_state, problem))
-                    paths[new_state] = (cur_state, action)
+                    new_action_list = action_list.copy()
+                    new_action_list.append(action)
+                    queue.push((new_state, new_action_list, cost + step_cost), cost + step_cost + heuristic(new_state, problem))
 
-    if problem.isGoalState(cur_state):
-        # Compile path from goal to start
-        path = []
-        while not cur_state == problem.getStartState():
-            cur_state, action = paths[cur_state]
-            path.append(action)
-        path.reverse()
-        return path
-    else:
-        print("Goal not found")
-        return None
+    print("Goal not found")
+    return None
 
 
 
