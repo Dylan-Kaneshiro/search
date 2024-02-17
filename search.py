@@ -209,8 +209,11 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     queue.push((cur_state, 0), 0 )
 
-    while (not problem.isGoalState(cur_state) and not queue.isEmpty()):
+    while (not queue.isEmpty()):
         cur_state, cost = queue.pop()
+
+        if problem.isGoalState(cur_state):
+            break
 
         if cur_state not in visited:
 
