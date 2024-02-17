@@ -495,7 +495,12 @@ def foodHeuristic(state, problem):
         return 0
 
     "*** YOUR CODE HERE ***"
-    # food_distances = [abs(x[0] - position[0]) + abs(x[1] - position[1]) for x in food]
+    # Heuristic is the max of the distances pacman has to travel through the maze to a particular food
+    # This calculation takes a long time because there is a lot of repeated work.
+    # However we can speed this up by calculating the maze distance from every food to every spot in the maze beforehand using bfs
+    # and storing the result in a dictionary in problem.heuristicInfo
+    # we would then access maze distances by doing for example problem.heuristicInfo['mazeDistances'][((1,2),(3,4))], 
+    # where (1,2) is position and (3,4) is the position of a food
     food_distances = [mazeDistance(position, x, problem.startingGameState) for x in food]
     return max(food_distances)
 
