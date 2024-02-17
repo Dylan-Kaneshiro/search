@@ -295,14 +295,16 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Store position and whether each corner has been visited
+        return (self.startingPosition, tuple(self.startingPosition == self.corners[i] for i in range(4)))
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Check whether every corner has been visited
+        return state[1][0] and state[1][1] and state[1][2] and state[1][3]
 
     def getSuccessors(self, state):
         """
@@ -325,6 +327,15 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x,y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+
+            # If new position doesn't hit wall, add as successor
+            if not self.walls[nextx][nexty]:
+                next_position = (nextx, nexty)
+                successor_state = (next_position, tuple((state[1][i] or next_position == self.corners[i]) for i in range(4)))
+                successors.append((successor_state, action, 1))
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -360,7 +371,28 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    # Calculate the minimum total manhattan distance to goal: distance to nearest unvisited corner + distance to from that corner to the next nearest unvisited corner + ...
+    # This value will always be less than or equal to the actual distance
+    min_manhattan_distance = 0
+    current_pos = state[0]
+    unvisited_corners = set([corners[i] for i in range(4) if not state[1][i]])
+
+    # Add to manhattan distance until all corners are visited
+    while not len(unvisited_corners) == 0:
+        # Find the nearest unvisited corner to the current position (actual current position or a newly visited corner)
+        min_dist = 999999
+        min_corner = None
+        for corner in unvisited_corners:
+            current_dist = util.manhattanDistance(current_pos, corner)
+            if current_dist < min_dist:
+                min_dist = current_dist
+                min_corner = corner
+        
+        # Add distance to newly visited corner, set to new position, and remove from unvisited corners
+        min_manhattan_distance += min_dist
+        current_pos = min_corner
+        unvisited_corners.remove(current_pos)
+    return min_manhattan_distance
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
